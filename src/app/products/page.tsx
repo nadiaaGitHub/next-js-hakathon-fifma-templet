@@ -1,19 +1,44 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { products } from '../../data/products';
 import { FaChevronDown, FaChevronUp, FaBars, FaTimes } from 'react-icons/fa';
 import Image from 'next/image';
+import { client } from '@/sanity/lib/client';
+
+async function getData() {
+  const fetchData = await client.fetch(`*[_type == 'product']{
+  _id,
+  productName,
+  status,
+  category,
+  description,
+  price,
+  tags,
+  "imageUrl": image.asset->url
+}`);
+  return fetchData;
+}
 
 export default function ProductsPage() {
+  const [data, setData] = useState<any[]>([]); // State to store fetched data
   const [genderOpen, setGenderOpen] = useState(false);
   const [kidsOpen, setKidsOpen] = useState(false);
   const [priceOpen, setPriceOpen] = useState(false);
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [showAllProducts, setShowAllProducts] = useState(false);
 
+  // Fetch data after the component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const fetchedData = await getData();
+      setData(fetchedData);
+    };
+    
+    fetchProducts();
+  }, []); // Empty dependency array ensures this runs only once when the component mounts
+
   // Determine the number of products to show based on screen size
-  const visibleProducts = showAllProducts ? products : products.slice(0, 3);
+  const visibleProducts = showAllProducts ? data : data.slice(0, 3);
 
   return (
     <section className="p-6 mx-auto max-w-[1290px]">
@@ -162,42 +187,49 @@ export default function ProductsPage() {
 
         {/* Products Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 flex-1">
-          {visibleProducts.map((product) => (
-            <div key={product.id} className="pt-2 pb-2 group">
-              <div className="relative">
-                <Image
-                  src={product.image}
-                  alt={product.name}
-                  width={500}
-                  height={500}
-                  className="w-full h-80 object-cover"
-                />
-                <Link href='/details' legacyBehavior>
-                  <a className="absolute inset-x-0 bottom-0 bg-black bg-opacity-80 text-white px-3 py-2 text-center rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-                    Details
-                  </a>
-                </Link>
-              </div>
+          {data.length > 0 ? (
+            data.map((val: any, i: number) => (
+              <div key={i} className="pt-2 pb-2 group">
+                <div className="relative">
+                  <Image
+                    src={val.imageUrl}
+                    alt={val.productName}
+                    width={500}
+                    height={500}
+                    className="w-full h-80 object-cover"
+                  />
+                  <Link href={`/products/${val._id}`} legacyBehavior>
+                    <a className="absolute inset-x-0 bottom-0 bg-black bg-opacity-80 text-white px-3 py-2 text-center rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                      Details
+                    </a>
+                  </Link>
 
-              <div className="mt-4 text-left">
-                {product.tag && (
-                  <span className="text-red-600 text-sm py-1 font-medium mb-2 block text-left">
-                    {product.tag}
-                  </span>
-                )}
-                <h2 className="text-sm font-bold">{product.name}</h2>
-                <p className="text-sm text-gray-500">{product.description}</p>
-                <p className="text-lg font-semibold mt-2">
-                  Price: ₹ {product.price.toLocaleString()}
-                </p>
+
+               
+                </div>
+
+                <div className="mt-4 text-left">
+                  {val.status && (
+                    <span className="text-red-600 text-sm py-1 font-medium mb-2 block text-left">
+                      {val.status}
+                    </span>
+                  )}
+                  <h2 className="text-sm font-bold">{val.productName}</h2>
+                  <p className="text-sm text-gray-500">{val.category}</p>
+                  <p className="text-lg font-semibold mt-2">
+                    Price: ₹ {val.price.toLocaleString()}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p>Loading products...</p>
+          )}
         </div>
       </div>
 
       {/* See More Button for small screens */}
-      {!showAllProducts && products.length > 3 && (
+      {!showAllProducts && data.length > 3 && (
         <div className="mt-6 text-center">
           <button
             onClick={() => setShowAllProducts(true)}

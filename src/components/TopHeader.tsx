@@ -4,18 +4,18 @@ import Image from 'next/image';
 
 export default function TopHeader() {
   return (
-    <header className="bg-[#F5F5F5] py-3 text-black px-6">
-      <div className="container mx-auto flex flex-wrap justify-between items-center">
+    <header className="bg-[#F5F5F5] text-black">
+      <div className="container mx-auto flex items-center justify-between py-2 px-3 max-w-[91.1%]">
         {/* Logo */}
         <div className="flex items-center">
           <Link href="/" legacyBehavior>
-            <a className="w-[24px] h-[24px] p-[3px] pt-[3px] pr-[2.59px] pb-[3.03px] pl-[2.21px]">
+            <a className="w-[24px] h-[24px] pt-[3px] pr-[2.59px] pb-[3.03px]">
               <Image
                 src="/images/header logo.png"
                 alt="Header Logo"
                 width={24}
                 height={24}
-                className="block"
+                className="w-14"
               />
             </a>
           </Link>
