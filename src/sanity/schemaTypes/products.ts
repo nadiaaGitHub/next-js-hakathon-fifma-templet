@@ -139,9 +139,23 @@ export const productSchema = {
         type: 'string',
       },
       {
+        name: 'gender',
+        title: 'Gender',
+        type: 'string',
+      },
+      {
         name: 'category',
         title: 'Category',
         type: 'string',
+        //   options: {
+        // list: ['Men Shoes','Women Shoes','Womens Basketball Jersey', 'Hoodies & Sweatshirts','Jackets','Trousers & Tights','Mens Short-Sleeve Graphic Fitness Top','Tracksuits','Jumpsuits & Rompers','Skirts & Dresses','Socks','Accessories & Equipment'], // Add categories here
+        // },
+      },
+      {
+        name: 'onSale',  // New field to mark sale items
+        title: 'On Sale',
+        type: 'boolean',
+        description: 'Check if this product is on sale',
       },
       {
         name: 'price',
@@ -153,12 +167,12 @@ export const productSchema = {
         title: 'Inventory',
         type: 'number',
       },
-      {
-        name: 'colors',
-        title: 'Colors',
-        type: 'array',
-        of: [{ type: 'string' }],
-      },
+      // {
+      //   name: 'colors',
+      //   title: 'Colors',
+      //   type: 'array',
+      //   of: [{ type: 'string' }],
+      // },
       {
         name: 'status',
         title: 'Status',

@@ -55,6 +55,8 @@ async function importData() {
         _type: 'product',
         productName: product.productName,
         category: product.category,
+        category: product.gender,
+        category: product.onSale,
         price: product.price,
         inventory: product.inventory,
         colors: product.colors || [], // Optional, as per your schema

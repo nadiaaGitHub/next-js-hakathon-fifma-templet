@@ -2,9 +2,22 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Search from './Search'; // Import the Search component
+import { useCart } from '@/context/CartContext'; // Import the CartContext
+
+// Define types for items in the cart and wishlist
+type CartItem = {
+  id: string;
+  quantity: number;
+};
+
+type WishlistItem = {
+  id: string;
+};
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { cart, wishlist }: { cart: CartItem[], wishlist: WishlistItem[] } = useCart(); // Get the cart and wishlist data from CartContext
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -35,17 +48,17 @@ export default function Navbar() {
               New & Featured
             </a>
           </Link>
-          <Link href="/products" legacyBehavior>
+          <Link href="/men" legacyBehavior>
             <a className="font-semibold text-lg hover:text-black hover:underline hover:font-bold">
               Men
             </a>
           </Link>
-          <Link href="/products" legacyBehavior>
+          <Link href="/women" legacyBehavior>
             <a className="font-semibold text-lg hover:text-black hover:underline hover:font-bold">
               Women
             </a>
           </Link>
-          <Link href="/products" legacyBehavior>
+          <Link href="/kids" legacyBehavior>
             <a className="font-semibold text-lg hover:text-black hover:underline hover:font-bold">
               Kids
             </a>
@@ -64,32 +77,14 @@ export default function Navbar() {
 
         {/* Search and Icons */}
         <div className="flex items-center space-x-4">
-          {/* Search Bar */}
+          {/* Add Search Component */}
           <div className="relative hidden lg:block">
-            <input
-              type="text"
-              placeholder="Search"
-              className="bg-gray-100 rounded-full py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
-            />
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="absolute left-3 top-2.5 w-4 h-4 text-black"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-4.35-4.35m0 0a7.5 7.5 0 111.414-1.414L21 21z"
-              />
-            </svg>
+            <Search />
           </div>
 
-          {/* Heart Image */}
-          <div className="w-9 h-9">
-            <Link href="/heart">
+          {/* Heart Icon (Wishlist Count) */}
+          <div className="relative w-9 h-9">
+            <Link href="/wishlist">
               <Image
                 src="/images/heart.png"
                 alt="Heart Icon"
@@ -98,10 +93,16 @@ export default function Navbar() {
                 className="w-full h-full"
               />
             </Link>
+            {/* Wishlist Item Count */}
+            {wishlist.length > 0 && (
+              <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full px-2 py-1">
+                {wishlist.length}
+              </span>
+            )}
           </div>
 
-          {/* Cart Image */}
-          <div className="w-9 h-9">
+          {/* Cart Icon */}
+          <div className="relative w-9 h-9">
             <Link href="/cart">
               <Image
                 src="/images/cart.png"
@@ -111,6 +112,12 @@ export default function Navbar() {
                 className="w-full h-full"
               />
             </Link>
+            {/* Cart Item Count */}
+            {cart.length > 0 && (
+              <span className="absolute -top-1 -right-2 bg-red-600 text-white text-xs rounded-full px-2 py-1">
+                {cart.reduce((total, item) => total + item.quantity, 0)}
+              </span>
+            )}
           </div>
 
           {/* Hamburger Menu Icon */}
@@ -141,29 +148,29 @@ export default function Navbar() {
         <div className="lg:hidden bg-white shadow-md py-2">
           <nav className="flex flex-col items-center space-y-2">
             <Link href="/features" className="text-sm font-medium text-gray-700 hover:text-black">
-                New & Featured
+              New & Featured
             </Link>
-            <Link href="/products" legacyBehavior>
+            <Link href="/men" legacyBehavior>
               <a className="text-sm font-medium text-gray-700 hover:text-black">
                 Men
               </a>
             </Link>
-            <Link href="/products" legacyBehavior>
+            <Link href="/women" legacyBehavior>
               <a className="text-sm font-medium text-gray-700 hover:text-black">
                 Women
               </a>
             </Link>
-            <Link href="/products" legacyBehavior>
+            <Link href="/kids" legacyBehavior>
               <a className="text-sm font-medium text-gray-700 hover:text-black">
                 Kids
               </a>
             </Link>
-            <Link href="/products" legacyBehavior>
+            <Link href="/sale" legacyBehavior>
               <a className="text-sm font-medium text-gray-700 hover:text-black">
                 Sale
               </a>
             </Link>
-            <Link href="/products" legacyBehavior>
+            <Link href="/snkrs" legacyBehavior>
               <a className="text-sm font-medium text-gray-700 hover:text-black">
                 SNKRS
               </a>

@@ -5,63 +5,88 @@ import { client } from '@/sanity/lib/client';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
 
-// Fetch product details by ID
 async function getProductById(id: string) {
-  const query = `*[_type == 'product' && _id == $id][0]{
-    _id,
-    productName,
-    description,
-    price,
-    color,
-    category,
-    "imageUrl": image.asset->url
-  }`;
-
-  const product = await client.fetch(query, { id });
-  console.log('Fetched product:', product); // Debug log
-  return product;
+  try {
+    const query = `*[_type == 'product' && _id == $id][0]{
+      _id,
+      productName,
+      description,
+      price,
+      category,
+      "imageUrl": image.asset->url
+    }`;
+    return await client.fetch(query, { id });
+  } catch (error) {
+    console.error('Error fetching product by ID:', error);
+    return null;
+  }
 }
 
-// Fetch related products
 async function getRelatedProducts(category: string, id: string) {
-  const query = `*[_type == 'product' && category == $category && _id != $id][0..2]{
-    _id,
-    productName,
-    price,
-    "imageUrl": image.asset->url
-  }`;
-
-  const relatedProducts = await client.fetch(query, { category, id });
-  console.log('Related products:', relatedProducts); // Debug log
-  return relatedProducts;
+  try {
+    const query = `*[_type == 'product' && category == $category && _id != $id][0..2]{
+      _id,
+      productName,
+      price,
+      "imageUrl": image.asset->url
+    }`;
+    return await client.fetch(query, { category, id });
+  } catch (error) {
+    console.error('Error fetching related products:', error);
+    return [];
+  }
 }
 
 interface ProductDetailsProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
+}
+
+interface Product {
+  _id: string;
+  productName: string;
+  description: string;
+  price: number;
+  category: string;
+  imageUrl: string;
+}
+
+interface RelatedProduct {
+  _id: string;
+  productName: string;
+  price: number;
+  imageUrl: string;
 }
 
 export default function ProductDetailsPage({ params }: ProductDetailsProps) {
   const router = useRouter();
   const { addToCart } = useCart();
-
-  const [product, setProduct] = useState<any>(null);
-  const [relatedProducts, setRelatedProducts] = useState<any[]>([]);
+  const [product, setProduct] = useState<Product | null>(null);
+  const [relatedProducts, setRelatedProducts] = useState<RelatedProduct[]>([]);
   const [selectedSize, setSelectedSize] = useState<string>('M');
   const [quantity, setQuantity] = useState<number>(1);
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      const productData = await getProductById(params.id);
-      setProduct(productData);
-
-      if (productData?.category) {
-        const related = await getRelatedProducts(productData.category, productData._id);
-        setRelatedProducts(related);
+    const fetchProductData = async () => {
+      const resolvedParams = await params; // Unwrap the promise
+      const { id } = resolvedParams;
+  
+      const productData = await getProductById(id);
+      if (productData) {
+        setProduct(productData);
+  
+        if (productData.category) {
+          const related = await getRelatedProducts(productData.category, productData._id);
+          setRelatedProducts(related);
+        }
+      } else {
+        console.error('Product not found');
+        router.push('/404'); // Redirect to 404 if product is not found
       }
     };
-
-    fetchProduct();
-  }, [params.id]);
+  
+    fetchProductData();
+  }, [params, router]); // Add 'router' to the dependency array
+  
 
   if (!product) {
     return (
@@ -91,7 +116,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsProps) {
         {/* Product Image */}
         <div className="flex justify-center">
           <Image
-            src={product.imageUrl || '/placeholder.png'} // Fallback image
+            src={product.imageUrl || '/placeholder.png'}
             alt={product.productName || 'No image available'}
             width={500}
             height={500}
@@ -119,9 +144,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsProps) {
                 <button
                   key={size}
                   className={`px-4 py-2 border rounded-md ${
-                    selectedSize === size
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'bg-white text-black border-gray-300'
+                    selectedSize === size ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-black border-gray-300'
                   }`}
                   onClick={() => setSelectedSize(size)}
                 >
@@ -160,7 +183,7 @@ export default function ProductDetailsPage({ params }: ProductDetailsProps) {
             {relatedProducts.map((relProduct) => (
               <div key={relProduct._id} className="border p-4 rounded-lg shadow-sm">
                 <Image
-                  src={relProduct.imageUrl || '/placeholder.png'} // Fallback image
+                  src={relProduct.imageUrl || '/placeholder.png'}
                   alt={relProduct.productName || 'No image available'}
                   width={300}
                   height={300}

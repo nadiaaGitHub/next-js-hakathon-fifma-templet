@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation"; // Importing useRouter for navigation
+import { useRouter } from "next/navigation";  // Importing useRouter for navigation
 import { client } from "@/sanity/lib/client";
 
 // Define the Product interface
@@ -15,14 +15,14 @@ interface Product {
   imageUrl: string;
 }
 
-const Men = () => {
+const Kids = () => {
   const [products, setProducts] = useState<Product[]>([]); // Use Product[] instead of any[]
-  const router = useRouter(); // Initialize useRouter
+  const router = useRouter();  // Initialize useRouter
 
-  // Fetch Men products data from Sanity
+  // Fetch Kids products data from Sanity
   useEffect(() => {
-    async function fetchMenProducts() {
-      const query = `*[_type == 'product' && gender == 'Men']{
+    async function fetchKidsProducts() {
+      const query = `*[_type == 'product' && gender == 'Kids']{
         _id,
         productName,
         price,
@@ -30,23 +30,23 @@ const Men = () => {
         description,
         "imageUrl": image.asset->url
       }`;
-      const data: Product[] = await client.fetch(query); // Cast fetched data to Product[]
+      const data: Product[] = await client.fetch(query); // Cast the fetched data to Product[]
       setProducts(data);
     }
 
-    fetchMenProducts();
+    fetchKidsProducts();
   }, []); // Empty dependency array to fetch products once when component mounts
 
   // Handle product click and navigate to the detail page
   const handleProductClick = (productId: string) => {
-    router.push(`/products/${productId}`); // Navigate to the product detail page
+    router.push(`/products/${productId}`);  // Navigate to the product detail page
   };
 
   return (
     <div className="mb-16 mt-6 mx-auto max-w-[1290px] px-4 font-Helvetica Neue">
       {/* Heading */}
       <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-center sm:text-left w-full sm:w-auto mb-6">
-        Men Products
+        Kids Products
       </h2>
 
       {/* Product Images Grid */}
@@ -54,8 +54,8 @@ const Men = () => {
         {products.map((product) => (
           <div
             key={product._id}
-            className="relative group product-card cursor-pointer" // Added cursor-pointer
-            onClick={() => handleProductClick(product._id)} // Product click handler
+            className="relative group product-card cursor-pointer"  // Added cursor-pointer
+            onClick={() => handleProductClick(product._id)}  // Product click handler
           >
             {/* Product Image */}
             <div className="relative overflow-hidden">
@@ -86,4 +86,4 @@ const Men = () => {
   );
 };
 
-export default Men;
+export default Kids;

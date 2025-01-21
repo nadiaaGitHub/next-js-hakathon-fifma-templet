@@ -1,8 +1,17 @@
-import React from 'react';
+
+"use client"
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function DoNotMiss() {
+  const [isClient, setIsClient] = useState(false);
+
+  // Set `isClient` to true only on the client side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   return (
     <section className="font-Helvetica Neue py-8 mx-auto px-4 max-w-[1280px]">
       {/* Heading */}
@@ -14,17 +23,20 @@ export default function DoNotMiss() {
       <div>
         {/* Image */}
         <div className="relative">
-          <Link href="/mens" legacyBehavior>
+          <Link href="/men" legacyBehavior>
             <a>
-              <Image
-                src="/images/don't miss.png"
-                alt="Don't Miss"
-                width={1334}
-                height={700}
-                layout="responsive"
-                objectFit="cover"
-                className="rounded-md"
-              />
+              {/* Render Image only on the client-side */}
+              {isClient && (
+                <Image
+                  src="/images/don't miss.png"
+                  alt="Don't Miss"
+                  width={1334}
+                  height={700}
+                  layout="responsive"
+                  objectFit="cover"
+                  className="rounded-md"
+                />
+              )}
             </a>
           </Link>
         </div>
@@ -37,9 +49,11 @@ export default function DoNotMiss() {
           <p className="text-gray-600 text-sm md:text-base pb-4 md:pb-5">
             Your built-to-last, all-week wears—but with style only Jordan Brand can deliver.
           </p>
-          <button className="rounded-full bg-black text-white hover:bg-blue-300 hover:text-black hover:text-lg py-2 px-6 transition-colors duration-300">
-            Shop
-          </button>
+          <Link href={'/products'}>
+            <button className="rounded-full bg-black text-white hover:bg-blue-300 hover:text-black hover:text-lg py-2 px-6 transition-colors duration-300">
+              Shop
+            </button>
+          </Link>
         </div>
       </div>
     </section>
